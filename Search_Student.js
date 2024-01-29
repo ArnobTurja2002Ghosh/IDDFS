@@ -15,7 +15,7 @@ class Search_Student {
         this.cost = 0;
 
         this.maxDepth = 0;
-        this.cutoff_occurred = false;
+        this.cutoff_occurred;
 
         this.inProgress = false;     // whether the search is in progress
         this.name = 'Student';
@@ -49,6 +49,7 @@ class Search_Student {
         this.path = [];             // set an empty path
 
         this.open =[new Node(sx, sy, null, null)];
+        this.cutoff_occurred=false;
         this.closed=[];
         console.log(this.open);
         // TODO: everything else necessary to start a new search
@@ -118,6 +119,8 @@ class Search_Student {
     //    none
     //
     searchIteration() {
+
+        if(this.grid.get(this.gx, this.gy)!=this.grid.get(this.sx, this.sy)){this.inProgress=false;}
                                                
         // if the search strategy is iddfs, call its own function
         if (this.config.strategy == 'iddfs') { this.searchIterationIDDFS(); return; }
@@ -171,6 +174,7 @@ class Search_Student {
                 console.log(this.maxDepth);
                 this.startSearch(this.sx, this.sy, this.gx, this.gy);
             }
+            else{ this.inProgress=false;}
         }
         //    If empty and caused by a depth cutoff
         //      Increase the maximum depth and start searching again
@@ -215,7 +219,6 @@ class Search_Student {
         return this.cutoff_occurred? "cutoff":"failure";
     }
     DLS1(node){
-        this.cutoff_occurred = false;
         if(node.depth>=this.maxDepth){
             this.cutoff_occurred =true;
             return "cutoff";
@@ -234,12 +237,18 @@ class Search_Student {
         loop1: for(let s=0; s<this.config.actions.length; s++){
             let node1 = new Node(node.x + this.config.actions[s][0], node.y + this.config.actions[s][1], this.config.actions[s], node);
             if(!this.isLegalAction(node.x, node.y, node1.action)){
-                if(this.open.length==0 && s==this.config.actions.length-1){this.cutoff_occurred = true;}
+                //if(this.open.length==0 && s==this.config.actions.length-1){this.cutoff_occurred = true;}
                 continue loop1;
             }
             for(let c=0; c<this.closed.length; c++){
                 if(this.closed[c].x == node1.x && this.closed[c].y == node1.y && node1.depth>=this.closed[c].depth){
-                    if(this.open.length==0 && s==this.config.actions.length-1){this.cutoff_occurred = true;}
+                    //if(this.open.length==0 && s==this.config.actions.length-1){this.cutoff_occurred = true;}
+                    continue loop1;
+                }
+            }
+            for(let c=0; c<this.open.length; c++){
+                if(this.open[c].x == node1.x && this.open[c].y == node1.y){
+                    //if(this.open.length==0 && s==this.config.actions.length-1){this.cutoff_occurred = true;}
                     continue loop1;
                 }
             }
